@@ -4,12 +4,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCRq2ZYVNS3MAt-2tBfmMydX-U-laz9O9s",
+  authDomain: "chittiproject-99ff2.firebaseapp.com",
+  projectId: "chittiproject-99ff2",
+  storageBucket: "chittiproject-99ff2.firebasestorage.app",
+  messagingSenderId: "73249371528",
+  appId: "1:73249371528:web:bc70d2a832aca92b02363d",
+  measurementId: "G-K8SNHKXHFQ"
 };
 
 // Initialize Firebase
