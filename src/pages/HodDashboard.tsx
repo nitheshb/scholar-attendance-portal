@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { 
@@ -23,8 +23,10 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import { LogOut, Users, UserCheck, School, BarChart, ChevronRight } from 'lucide-react';
+import { LogOut, Users, UserCheck, School, BarChart, ChevronRight, UserPlus, BookOpen } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import AddStudentForm from '../components/AddStudentForm';
+import AddTeacherForm from '../components/AddTeacherForm';
 
 type Teacher = {
   id: string;
@@ -323,6 +325,10 @@ const HodDashboard = () => {
                 <UserCheck className="h-4 w-4" />
                 Students
               </TabsTrigger>
+              <TabsTrigger value="management" className="flex items-center gap-2">
+                <School className="h-4 w-4" />
+                Management
+              </TabsTrigger>
             </TabsList>
             
             {/* Teachers Tab */}
@@ -499,6 +505,39 @@ const HodDashboard = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            {/* Management Tab */}
+            <TabsContent value="management">
+              <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+                {/* Add Student Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <UserPlus className="h-5 w-5 text-brand-600" />
+                      Student Registration
+                    </CardTitle>
+                    <CardDescription>Add a new student to the system</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <AddStudentForm />
+                  </CardContent>
+                </Card>
+                
+                {/* Add Teacher Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpen className="h-5 w-5 text-brand-600" />
+                      Teacher Registration
+                    </CardTitle>
+                    <CardDescription>Add a new teacher to the system</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <AddTeacherForm />
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
