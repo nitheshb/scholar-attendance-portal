@@ -174,9 +174,18 @@ const TeacherDashboard = () => {
 
   // Mark attendance for a student
   const markAttendance = async (studentId: string, status: 'present' | 'absent' | 'late') => {
-    if (!currentUser || !selectedDate) return;
+    if (!currentUser || !selectedDate) {
+      console.log("Missing user or date:", { currentUser, selectedDate });
+      toast({
+        title: "Error",
+        description: "User not logged in or no date selected",
+        variant: "destructive"
+      });
+      return;
+    }
     
     try {
+      console.log("Marking attendance:", { studentId, status, date: selectedDate });
       const record = attendanceData.find(record => record.studentId === studentId);
       
       // If record exists, update it
@@ -420,22 +429,31 @@ const TeacherDashboard = () => {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
                                     <DropdownMenuItem
-                                      className="text-green-600"
-                                      onClick={() => markAttendance(student.id, 'present')}
+                                      className="text-green-600 cursor-pointer"
+                                      onSelect={(e) => {
+                                        e.preventDefault();
+                                        markAttendance(student.id, 'present');
+                                      }}
                                     >
                                       <CheckCircle className="mr-2 h-4 w-4" />
                                       <span>Mark Present</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                      className="text-yellow-600"
-                                      onClick={() => markAttendance(student.id, 'late')}
+                                      className="text-yellow-600 cursor-pointer"
+                                      onSelect={(e) => {
+                                        e.preventDefault();
+                                        markAttendance(student.id, 'late');
+                                      }}
                                     >
                                       <Clock className="mr-2 h-4 w-4" />
                                       <span>Mark Late</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                      className="text-red-600"
-                                      onClick={() => markAttendance(student.id, 'absent')}
+                                      className="text-red-600 cursor-pointer"
+                                      onSelect={(e) => {
+                                        e.preventDefault();
+                                        markAttendance(student.id, 'absent');
+                                      }}
                                     >
                                       <XCircle className="mr-2 h-4 w-4" />
                                       <span>Mark Absent</span>
