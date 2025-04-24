@@ -40,6 +40,7 @@ import AddTeacherForm from '../components/AddTeacherForm';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { deleteUser } from 'firebase/auth';
 import { AddHodForm } from '../components/AddHodForm';
+import { EditUserForm } from '../components/EditUserForm';
 
 type Teacher = {
   id: string;
@@ -75,6 +76,11 @@ const HodDashboard = () => {
   const [attendanceSummaries, setAttendanceSummaries] = useState<Record<string, AttendanceSummary>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+  const [selectedUserForEdit, setSelectedUserForEdit] = useState<{
+    id: string;
+    data: any;
+    type: 'teacher' | 'student' | 'hod';
+  } | null>(null);
 
   // Redirect if not logged in or not an HOD
   useEffect(() => {
@@ -353,7 +359,7 @@ const HodDashboard = () => {
         </div>
         
         <div className="space-y-6">
-          <Tabs defaultValue="teachers">
+          <Tabs defaultValue="students">
             <TabsList className="mb-4">
               <TabsTrigger value="teachers" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
@@ -405,56 +411,17 @@ const HodDashboard = () => {
                               <TableCell>{teacher.department}</TableCell>
                               <TableCell className="text-right">
                                 <div className="flex justify-end space-x-2">
-                                  <Dialog>
-                                    <DialogTrigger asChild>
-                                      <Button 
-                                        variant="ghost" 
-                                        className="flex items-center gap-1 text-brand-600 hover:text-brand-800"
-                                        onClick={() => setSelectedTeacher(teacher)}
-                                      >
-                                        View Details
-                                        <ChevronRight className="h-4 w-4" />
-                                      </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-md">
-                                      <DialogHeader>
-                                        <DialogTitle>Teacher Details</DialogTitle>
-                                        <DialogDescription>
-                                          Detailed information about the teacher
-                                        </DialogDescription>
-                                      </DialogHeader>
-                                      {selectedTeacher && (
-                                        <div className="space-y-4 py-4">
-                                          <div className="flex justify-center mb-4">
-                                            <div className="h-20 w-20 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 text-2xl font-semibold">
-                                              {selectedTeacher.name[0].toUpperCase()}
-                                            </div>
-                                          </div>
-                                          <div className="text-center mb-4">
-                                            <h3 className="text-xl font-bold">{selectedTeacher.name}</h3>
-                                            <p className="text-sm text-gray-500">{selectedTeacher.email}</p>
-                                          </div>
-                                          <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                                            <div className="flex justify-between">
-                                              <span className="text-sm text-gray-500">Employee ID</span>
-                                              <span className="text-sm font-medium">{selectedTeacher.employeeId}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                              <span className="text-sm text-gray-500">Department</span>
-                                              <span className="text-sm font-medium">{selectedTeacher.department}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                              <span className="text-sm text-gray-500">Status</span>
-                                              <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                                                Active
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </DialogContent>
-                                  </Dialog>
-                                  
+                                  <Button
+                                    variant="ghost"
+                                    className="flex items-center gap-1 text-brand-600 hover:text-brand-800"
+                                    onClick={() => setSelectedUserForEdit({
+                                      id: teacher.id,
+                                      data: teacher,
+                                      type: 'teacher'
+                                    })}
+                                  >
+                                    Edit
+                                  </Button>
                                   <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                       <Button 
@@ -564,33 +531,46 @@ const HodDashboard = () => {
                                   )}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <Button 
-                                        variant="ghost" 
-                                        className="text-red-600 hover:text-red-800"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Delete Student</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          Are you sure you want to delete this student? This action cannot be undone.
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction
-                                          className="bg-red-600 hover:bg-red-700"
-                                          onClick={() => handleDeleteUser(student.id, student.email, 'student')}
+                                  <div className="flex justify-end space-x-2">
+                                    <Button
+                                      variant="ghost"
+                                      className="flex items-center gap-1 text-brand-600 hover:text-brand-800"
+                                      onClick={() => setSelectedUserForEdit({
+                                        id: student.id,
+                                        data: student,
+                                        type: 'student'
+                                      })}
+                                    >
+                                      Edit
+                                    </Button>
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button 
+                                          variant="ghost" 
+                                          className="text-red-600 hover:text-red-800"
                                         >
-                                          Delete
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Delete Student</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            Are you sure you want to delete this student? This action cannot be undone.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogAction
+                                            className="bg-red-600 hover:bg-red-700"
+                                            onClick={() => handleDeleteUser(student.id, student.email, 'student')}
+                                          >
+                                            Delete
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </div>
                                 </TableCell>
                               </TableRow>
                             );
@@ -655,6 +635,16 @@ const HodDashboard = () => {
           </Tabs>
         </div>
       </main>
+
+      {selectedUserForEdit && (
+        <EditUserForm
+          userId={selectedUserForEdit.id}
+          initialData={selectedUserForEdit.data}
+          userType={selectedUserForEdit.type}
+          open={!!selectedUserForEdit}
+          onClose={() => setSelectedUserForEdit(null)}
+        />
+      )}
     </div>
   );
 };
