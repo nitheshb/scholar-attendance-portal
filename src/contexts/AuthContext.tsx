@@ -6,7 +6,8 @@ import {
   onAuthStateChanged,
   User
 } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth, db } from '../config/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 type UserRole = 'student' | 'teacher' | 'hod';
 
@@ -35,14 +36,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-      // Try to get stored role
       if (user) {
-        const storedRole = localStorage.getItem('userRole') as UserRole | null;
-        setUserRole(storedRole);
+        // Get user role from Firestore
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const role = userDoc.data()?.role as UserRole;
+        setUserRole(role);
+        localStorage.setItem('userRole', role);
       } else {
         setUserRole(null);
+        localStorage.removeItem('userRole');
       }
       setLoading(false);
     });
@@ -52,9 +56,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string, role: UserRole) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setUserRole(role);
-      localStorage.setItem('userRole', role);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Get user's role from Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      const userRole = userDoc.data()?.role;
+
+      // Verify role matches
+      if (userRole !== role) {
+        await firebaseSignOut(auth);
+        throw new Error(`Access denied. You can only login as ${userRole}.`);
+      }
+
+      setUserRole(userRole);
+      localStorage.setItem('userRole', userRole);
     } catch (error) {
       console.error("Login error:", error);
       throw error;

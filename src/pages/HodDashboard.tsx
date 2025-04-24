@@ -39,6 +39,7 @@ import AddStudentForm from '../components/AddStudentForm';
 import AddTeacherForm from '../components/AddTeacherForm';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { deleteUser } from 'firebase/auth';
+import { AddHodForm } from '../components/AddHodForm';
 
 type Teacher = {
   id: string;
@@ -351,7 +352,6 @@ const HodDashboard = () => {
           </Card>
         </div>
         
-        {/* Main Content */}
         <div className="space-y-6">
           <Tabs defaultValue="teachers">
             <TabsList className="mb-4">
@@ -367,9 +367,12 @@ const HodDashboard = () => {
                 <School className="h-4 w-4" />
                 Management
               </TabsTrigger>
+              <TabsTrigger value="add-hod" className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                Add HOD
+              </TabsTrigger>
             </TabsList>
             
-            {/* Teachers Tab */}
             <TabsContent value="teachers">
               <Card>
                 <CardHeader>
@@ -495,7 +498,6 @@ const HodDashboard = () => {
               </Card>
             </TabsContent>
             
-            {/* Students Tab */}
             <TabsContent value="students">
               <Card>
                 <CardHeader>
@@ -605,10 +607,8 @@ const HodDashboard = () => {
               </Card>
             </TabsContent>
             
-            {/* Management Tab */}
             <TabsContent value="management">
               <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-                {/* Add Student Section */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -622,7 +622,6 @@ const HodDashboard = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Add Teacher Section */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -636,6 +635,22 @@ const HodDashboard = () => {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+
+            {/* Add HOD Tab */}
+            <TabsContent value="add-hod">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UserPlus className="h-5 w-5 text-brand-600" />
+                    HOD Registration
+                  </CardTitle>
+                  <CardDescription>Add a new Head of Department to the system</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AddHodForm />
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
